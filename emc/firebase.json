@@ -1,0 +1,39 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "elegantmedicalcenter-bfba2",
+          "appId": "1:877260324568:android:a5960836d8c8bda116e1ad",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "elegantmedicalcenter-bfba2",
+          "configurations": {
+            "android": "1:877260324568:android:a5960836d8c8bda116e1ad",
+            "ios": "1:877260324568:ios:246cbde0756ade8716e1ad",
+            "macos": "1:877260324568:ios:246cbde0756ade8716e1ad",
+            "web": "1:877260324568:web:3225c188efe408c116e1ad",
+            "windows": "1:877260324568:web:e55859a476dacade16e1ad"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "877260324568",
+    "project_id": "elegantmedicalcenter-bfba2",
+    "storage_bucket": "elegantmedicalcenter-bfba2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:877260324568:android:a5960836d8c8bda116e1ad",
+        "android_client_info": {
+          "package_name": "com.example.emc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAt0F62kxcKZ6q5l2bOAh8ipC6G7BIsCg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

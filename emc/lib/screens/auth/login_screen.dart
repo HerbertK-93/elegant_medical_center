@@ -11,11 +11,30 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _loading = false;
+
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 800));
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _login() async {
     setState(() => _loading = true);
@@ -68,85 +87,88 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.teal.shade700, Colors.blue.shade900],
+            colors: [Colors.indigo.shade700, Colors.purple.shade900],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: Center(
-          child: SizedBox(
-            width: 400,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24)),
-              elevation: 16,
-              shadowColor: Colors.black45,
-              child: Padding(
-                padding: const EdgeInsets.all(28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.local_hospital,
-                        size: 64, color: Colors.teal.shade700),
-                    SizedBox(height: 16),
-                    Text("Elegant Medical Center",
-                        style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.teal.shade800)),
-                    SizedBox(height: 32),
-                    TextField(
-                        controller: _emailController,
-                        decoration: _inputDecoration("Email", Icons.email)),
-                    SizedBox(height: 16),
-                    TextField(
-                      controller: _passwordController,
-                      decoration:
-                          _inputDecoration("Password", Icons.lock_outline),
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 28),
-                    _loading
-                        ? CircularProgressIndicator()
-                        : ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              padding: EdgeInsets.zero,
-                            ).copyWith(
-                              backgroundColor: MaterialStateProperty.all(
-                                Colors.transparent,
-                              ),
-                              elevation: MaterialStateProperty.all(0),
-                            ),
-                            onPressed: _login,
-                            child: Ink(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.teal, Colors.blue],
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: Text("Login",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                            ),
-                          ),
-                    SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () => Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => SignUpScreen())),
-                      child: Text("Don't have an account? Sign up",
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: SizedBox(
+              width: 400,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24)),
+                elevation: 16,
+                shadowColor: Colors.black45,
+                child: Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.local_hospital,
+                          size: 64, color: Colors.purple.shade700),
+                      SizedBox(height: 16),
+                      Text("Elegant Medical Center",
                           style: TextStyle(
-                              fontSize: 14, color: Colors.teal.shade700)),
-                    ),
-                  ],
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.purple.shade800)),
+                      SizedBox(height: 32),
+                      TextField(
+                          controller: _emailController,
+                          decoration: _inputDecoration("Email", Icons.email)),
+                      SizedBox(height: 16),
+                      TextField(
+                        controller: _passwordController,
+                        decoration:
+                            _inputDecoration("Password", Icons.lock_outline),
+                        obscureText: true,
+                      ),
+                      SizedBox(height: 28),
+                      _loading
+                          ? CircularProgressIndicator()
+                          : ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 50),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16)),
+                                padding: EdgeInsets.zero,
+                              ).copyWith(
+                                backgroundColor: MaterialStateProperty.all(
+                                  Colors.transparent,
+                                ),
+                                elevation: MaterialStateProperty.all(0),
+                              ),
+                              onPressed: _login,
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [Colors.purple, Colors.indigo],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: Text("Login",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white)),
+                                ),
+                              ),
+                            ),
+                      SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () => Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => SignUpScreen())),
+                        child: Text("Don't have an account? Sign up",
+                            style: TextStyle(
+                                fontSize: 14, color: Colors.purple.shade700)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

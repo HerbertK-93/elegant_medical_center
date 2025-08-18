@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/auth_service.dart';
 import '../admin/admin_home.dart';
 import '../user/user_home.dart';
 import 'signup_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -48,40 +48,106 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loading = false);
   }
 
+  InputDecoration _inputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.9),
+      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SizedBox(
-          width: 400,
-          child: Card(
-            elevation: 8,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("Elegant Medical Center",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 20),
-                  TextField(
-                      controller: _emailController,
-                      decoration: InputDecoration(labelText: "Email")),
-                  TextField(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.teal.shade700, Colors.blue.shade900],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: SizedBox(
+            width: 400,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24)),
+              elevation: 16,
+              shadowColor: Colors.black45,
+              child: Padding(
+                padding: const EdgeInsets.all(28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.local_hospital,
+                        size: 64, color: Colors.teal.shade700),
+                    SizedBox(height: 16),
+                    Text("Elegant Medical Center",
+                        style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal.shade800)),
+                    SizedBox(height: 32),
+                    TextField(
+                        controller: _emailController,
+                        decoration: _inputDecoration("Email", Icons.email)),
+                    SizedBox(height: 16),
+                    TextField(
                       controller: _passwordController,
-                      decoration: InputDecoration(labelText: "Password"),
-                      obscureText: true),
-                  SizedBox(height: 20),
-                  _loading
-                      ? CircularProgressIndicator()
-                      : ElevatedButton(onPressed: _login, child: Text("Login")),
-                  TextButton(
-                    onPressed: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => SignUpScreen())),
-                    child: Text("Don't have an account? Sign up"),
-                  ),
-                ],
+                      decoration:
+                          _inputDecoration("Password", Icons.lock_outline),
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 28),
+                    _loading
+                        ? CircularProgressIndicator()
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(double.infinity, 50),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              padding: EdgeInsets.zero,
+                            ).copyWith(
+                              backgroundColor: MaterialStateProperty.all(
+                                Colors.transparent,
+                              ),
+                              elevation: MaterialStateProperty.all(0),
+                            ),
+                            onPressed: _login,
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.teal, Colors.blue],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Text("Login",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white)),
+                              ),
+                            ),
+                          ),
+                    SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () => Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => SignUpScreen())),
+                      child: Text("Don't have an account? Sign up",
+                          style: TextStyle(
+                              fontSize: 14, color: Colors.teal.shade700)),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

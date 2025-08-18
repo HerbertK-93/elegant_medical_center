@@ -11,12 +11,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm ci
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
         working-directory: ./emc
 
-      - name: Deploy to Firebase Hosting (preview)
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      - run: flutter build web --release
+        working-directory: ./emc
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ELEGANTMEDICALCENTER_BFBA2 }}

@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _loading = false;
+  bool _obscurePassword = true;
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -67,7 +68,8 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() => _loading = false);
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
+  InputDecoration _inputDecoration(String label, IconData icon,
+      {bool isPassword = false}) {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon),
@@ -78,6 +80,15 @@ class _LoginScreenState extends State<LoginScreen>
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
       ),
+      suffixIcon: isPassword
+          ? IconButton(
+              icon: Icon(
+                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: () =>
+                  setState(() => _obscurePassword = !_obscurePassword),
+            )
+          : null,
     );
   }
 
@@ -87,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen>
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.indigo.shade700, Colors.purple.shade900],
+            colors: [Colors.purple.shade200, Colors.indigo.shade300],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -101,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen>
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24)),
                 elevation: 16,
-                shadowColor: Colors.black45,
+                shadowColor: Colors.black26,
                 child: Padding(
                   padding: const EdgeInsets.all(28),
                   child: Column(
@@ -122,9 +133,10 @@ class _LoginScreenState extends State<LoginScreen>
                       SizedBox(height: 16),
                       TextField(
                         controller: _passwordController,
-                        decoration:
-                            _inputDecoration("Password", Icons.lock_outline),
-                        obscureText: true,
+                        decoration: _inputDecoration(
+                            "Password", Icons.lock_outline,
+                            isPassword: true),
+                        obscureText: _obscurePassword,
                       ),
                       SizedBox(height: 28),
                       _loading

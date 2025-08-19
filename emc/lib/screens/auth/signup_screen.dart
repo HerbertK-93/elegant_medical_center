@@ -16,6 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   String _department = "dentistry";
   final _authService = AuthService();
   bool _loading = false;
+  bool _obscurePassword = true;
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -55,7 +56,8 @@ class _SignUpScreenState extends State<SignUpScreen>
     setState(() => _loading = false);
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
+  InputDecoration _inputDecoration(String label, IconData icon,
+      {bool isPassword = false}) {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon),
@@ -66,6 +68,15 @@ class _SignUpScreenState extends State<SignUpScreen>
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
       ),
+      suffixIcon: isPassword
+          ? IconButton(
+              icon: Icon(
+                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: () =>
+                  setState(() => _obscurePassword = !_obscurePassword),
+            )
+          : null,
     );
   }
 
@@ -75,7 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen>
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.indigo.shade700, Colors.purple.shade900],
+            colors: [Colors.purple.shade200, Colors.indigo.shade300],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -89,7 +100,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24)),
                 elevation: 16,
-                shadowColor: Colors.black45,
+                shadowColor: Colors.black26,
                 child: Padding(
                   padding: const EdgeInsets.all(28),
                   child: SingleChildScrollView(
@@ -116,12 +127,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                         SizedBox(height: 16),
                         TextField(
                           controller: _passwordController,
-                          decoration:
-                              _inputDecoration("Password", Icons.lock_outline),
-                          obscureText: true,
+                          decoration: _inputDecoration(
+                              "Password", Icons.lock_outline,
+                              isPassword: true),
+                          obscureText: _obscurePassword,
                         ),
                         SizedBox(height: 16),
-                        // Role dropdown styled
                         DropdownButtonFormField<String>(
                           value: _role,
                           decoration: _inputDecoration(
@@ -141,7 +152,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                         ),
                         if (_role == "user") ...[
                           SizedBox(height: 16),
-                          // Department dropdown styled
                           DropdownButtonFormField<String>(
                             value: _department,
                             decoration:

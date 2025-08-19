@@ -12,11 +12,16 @@ class _SignUpScreenState extends State<SignUpScreen>
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _adminKeyController = TextEditingController();
+
   String _role = "user";
   String _department = "dentistry";
   final _authService = AuthService();
   bool _loading = false;
   bool _obscurePassword = true;
+  bool _obscureAdminKey = true;
+
+  static const String ADMIN_KEY = "f9enmwdk*72XWJ"; // secure admin key
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -39,12 +44,27 @@ class _SignUpScreenState extends State<SignUpScreen>
   void _signup() async {
     setState(() => _loading = true);
     try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+      final name = _nameController.text.trim();
+
+      // Validate email format
+      if (!RegExp(r"^[^@]+@[^@]+\.[^@]+").hasMatch(email)) {
+        throw Exception("Please enter a valid email address");
+      }
+
+      // Admin requires key
+      if (_role == "admin" && _adminKeyController.text.trim() != ADMIN_KEY) {
+        throw Exception("Invalid Administration Key");
+      }
+
       await _authService.signUp(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-        _nameController.text.trim(),
+        email,
+        password,
+        name,
         _role,
       );
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Account created successfully! Please login.")));
       Navigator.pushReplacement(
@@ -57,12 +77,12 @@ class _SignUpScreenState extends State<SignUpScreen>
   }
 
   InputDecoration _inputDecoration(String label, IconData icon,
-      {bool isPassword = false}) {
+      {bool isPassword = false, bool isAdminKey = false}) {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.9),
+      fillColor: Colors.white,
       contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -76,7 +96,15 @@ class _SignUpScreenState extends State<SignUpScreen>
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
             )
-          : null,
+          : isAdminKey
+              ? IconButton(
+                  icon: Icon(
+                    _obscureAdminKey ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () =>
+                      setState(() => _obscureAdminKey = !_obscureAdminKey),
+                )
+              : null,
     );
   }
 
@@ -86,7 +114,7 @@ class _SignUpScreenState extends State<SignUpScreen>
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.purple.shade200, Colors.indigo.shade300],
+            colors: [Colors.blueGrey.shade100, Colors.blueGrey.shade200],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -99,7 +127,7 @@ class _SignUpScreenState extends State<SignUpScreen>
               child: Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24)),
-                elevation: 16,
+                elevation: 12,
                 shadowColor: Colors.black26,
                 child: Padding(
                   padding: const EdgeInsets.all(28),
@@ -108,13 +136,13 @@ class _SignUpScreenState extends State<SignUpScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.person_add_alt_1,
-                            size: 64, color: Colors.purple.shade700),
+                            size: 64, color: Colors.blueGrey.shade700),
                         SizedBox(height: 16),
                         Text("Create an Account",
                             style: TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.purple.shade800)),
+                                color: Colors.blueGrey.shade900)),
                         SizedBox(height: 32),
                         TextField(
                             controller: _nameController,
@@ -139,7 +167,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                               "Role", Icons.admin_panel_settings),
                           dropdownColor: Colors.white,
                           icon: Icon(Icons.arrow_drop_down,
-                              color: Colors.purple.shade700),
+                              color: Colors.blueGrey.shade700),
                           borderRadius: BorderRadius.circular(16),
                           items: ["admin", "user"]
                               .map((role) => DropdownMenuItem(
@@ -150,6 +178,16 @@ class _SignUpScreenState extends State<SignUpScreen>
                               .toList(),
                           onChanged: (val) => setState(() => _role = val!),
                         ),
+                        if (_role == "admin") ...[
+                          SizedBox(height: 16),
+                          TextField(
+                            controller: _adminKeyController,
+                            decoration: _inputDecoration(
+                                "Administration Key", Icons.vpn_key,
+                                isAdminKey: true),
+                            obscureText: _obscureAdminKey,
+                          ),
+                        ],
                         if (_role == "user") ...[
                           SizedBox(height: 16),
                           DropdownButtonFormField<String>(
@@ -158,7 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                 _inputDecoration("Department", Icons.business),
                             dropdownColor: Colors.white,
                             icon: Icon(Icons.arrow_drop_down,
-                                color: Colors.purple.shade700),
+                                color: Colors.blueGrey.shade700),
                             borderRadius: BorderRadius.circular(16),
                             items: ["dentistry", "radiology", "orthopedics"]
                                 .map((d) => DropdownMenuItem(
@@ -190,7 +228,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                 child: Ink(
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
-                                      colors: [Colors.purple, Colors.indigo],
+                                      colors: [Colors.blueGrey, Colors.indigo],
                                     ),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
@@ -210,7 +248,8 @@ class _SignUpScreenState extends State<SignUpScreen>
                               MaterialPageRoute(builder: (_) => LoginScreen())),
                           child: Text("Already have an account? Login",
                               style: TextStyle(
-                                  fontSize: 14, color: Colors.purple.shade700)),
+                                  fontSize: 14,
+                                  color: Colors.blueGrey.shade700)),
                         ),
                       ],
                     ),

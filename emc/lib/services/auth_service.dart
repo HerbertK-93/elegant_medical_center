@@ -14,21 +14,29 @@ class AuthService {
     return result.user;
   }
 
-  Future<User?> signUp(String name, String email, String password, String role,
-      {String? department}) async {
+  Future<User?> signUp(
+    String email,
+    String password,
+    String name,
+    String role, {
+    String? department,
+  }) async {
     final result = await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
     final user = result.user;
+
     if (user != null) {
       final userModel = UserModel(
         uid: user.uid,
         name: name,
         email: email,
         role: role,
-        department: department,
+        department: role == "user" ? department : null, // only for users
       );
+
       await _db.collection('users').doc(user.uid).set(userModel.toMap());
     }
+
     return user;
   }
 

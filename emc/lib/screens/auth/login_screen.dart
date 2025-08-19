@@ -44,12 +44,23 @@ class _LoginScreenState extends State<LoginScreen>
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
+
       if (user != null) {
         var snap = await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
             .get();
-        var role = snap['role'];
+
+        if (!snap.exists) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("No profile found for this account.")));
+          setState(() => _loading = false);
+          return;
+        }
+
+        var data = snap.data()!;
+        var role = data['role'] ?? 'user';
+
         if (role == 'admin') {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => AdminHome()));
@@ -57,7 +68,8 @@ class _LoginScreenState extends State<LoginScreen>
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => UserHome(department: snap['department']),
+                builder: (_) =>
+                    UserHome(department: data['department'] ?? "General"),
               ));
         }
       }

@@ -31,7 +31,7 @@ class DentistryDashboard extends StatelessWidget {
           children: [
             _buildDashboardCard(
               context,
-              label: "Patient Record",
+              label: "Create Patient Form",
               color: Colors.teal,
               icon: Icons.person,
               onTap: () => _showPatientRecordSheet(context),
@@ -114,7 +114,7 @@ class DentistryDashboard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               title: const Text(
-                "Patient Record",
+                "Create Patient Form",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               content: SizedBox(

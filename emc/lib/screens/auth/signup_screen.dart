@@ -20,7 +20,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   bool _obscurePassword = true;
   bool _obscureAdminKey = true;
 
-  static const String ADMIN_KEY = "f9enmwdk*72XWJ#-\$@!";
+  static const String ADMIN_KEY = "f9enmwdk*72XWJ#-@!";
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;

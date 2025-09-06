@@ -33,9 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
             context, MaterialPageRoute(builder: (_) => AdminHome()));
       } else {
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (_) => UserHome(department: snapshot['department'])));
+            context, MaterialPageRoute(builder: (_) => UserHome()));
       }
     }
   }

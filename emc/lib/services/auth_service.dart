@@ -10,7 +10,9 @@ class AuthService {
 
   Future<User?> signIn(String email, String password) async {
     final result = await _auth.signInWithEmailAndPassword(
-        email: email, password: password);
+      email: email,
+      password: password,
+    );
     return result.user;
   }
 
@@ -18,11 +20,12 @@ class AuthService {
     String email,
     String password,
     String name,
-    String role, {
-    String? department,
-  }) async {
+    String role,
+  ) async {
     final result = await _auth.createUserWithEmailAndPassword(
-        email: email, password: password);
+      email: email,
+      password: password,
+    );
     final user = result.user;
 
     if (user != null) {
@@ -31,10 +34,15 @@ class AuthService {
         name: name,
         email: email,
         role: role,
-        department: role == "user" ? department : null, // only for users
       );
 
-      await _db.collection('users').doc(user.uid).set(userModel.toMap());
+      // ✅ Save user profile in Firestore under "users/{uid}"
+      await _db.collection('users').doc(user.uid).set({
+        "name": userModel.name,
+        "email": userModel.email,
+        "role": userModel.role,
+        "createdAt": FieldValue.serverTimestamp(),
+      });
     }
 
     return user;

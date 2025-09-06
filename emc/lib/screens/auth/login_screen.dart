@@ -7,13 +7,17 @@ import '../user/user_home.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  final String? prefilledEmail; // 👈 new parameter
+
+  const LoginScreen({Key? key, this.prefilledEmail}) : super(key: key);
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-  final _emailController = TextEditingController();
+  late TextEditingController _emailController;
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _loading = false;
@@ -25,6 +29,12 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
+
+    // 👇 initialize with prefilled email if provided
+    _emailController = TextEditingController(
+      text: widget.prefilledEmail ?? "",
+    );
+
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 800));
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
@@ -34,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void dispose() {
     _controller.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -68,8 +80,7 @@ class _LoginScreenState extends State<LoginScreen>
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) =>
-                    UserHome(department: data['department'] ?? "General"),
+                builder: (_) => UserHome(),
               ));
         }
       }
@@ -86,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen>
       labelText: label,
       prefixIcon: Icon(icon),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.9),
+      fillColor: Colors.white,
       contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -110,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen>
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.purple.shade200, Colors.indigo.shade300],
+            colors: [Colors.blueGrey.shade100, Colors.blueGrey.shade200],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -119,11 +130,11 @@ class _LoginScreenState extends State<LoginScreen>
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: SizedBox(
-              width: 400,
+              width: 420,
               child: Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24)),
-                elevation: 16,
+                elevation: 12,
                 shadowColor: Colors.black26,
                 child: Padding(
                   padding: const EdgeInsets.all(28),
@@ -131,13 +142,13 @@ class _LoginScreenState extends State<LoginScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.local_hospital,
-                          size: 64, color: Colors.purple.shade700),
+                          size: 64, color: Colors.blueGrey.shade700),
                       SizedBox(height: 16),
-                      Text("Elegant Medical Center",
+                      Text("Elegant Medical Clinic",
                           style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
-                              color: Colors.purple.shade800)),
+                              color: Colors.blueGrey.shade900)),
                       SizedBox(height: 32),
                       TextField(
                           controller: _emailController,
@@ -169,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen>
                               child: Ink(
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    colors: [Colors.purple, Colors.indigo],
+                                    colors: [Colors.blueGrey, Colors.indigo],
                                   ),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -189,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen>
                             MaterialPageRoute(builder: (_) => SignUpScreen())),
                         child: Text("Don't have an account? Sign up",
                             style: TextStyle(
-                                fontSize: 14, color: Colors.purple.shade700)),
+                                fontSize: 14, color: Colors.blueGrey.shade700)),
                       ),
                     ],
                   ),

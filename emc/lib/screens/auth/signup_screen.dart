@@ -15,13 +15,12 @@ class _SignUpScreenState extends State<SignUpScreen>
   final _adminKeyController = TextEditingController();
 
   String _role = "user";
-  String _department = "dentistry";
   final _authService = AuthService();
   bool _loading = false;
   bool _obscurePassword = true;
   bool _obscureAdminKey = true;
 
-  static const String ADMIN_KEY = "f9enmwdk*72XWJ"; // secure admin key
+  static const String ADMIN_KEY = "f9enmwdk*72XWJ";
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -48,6 +47,12 @@ class _SignUpScreenState extends State<SignUpScreen>
       final password = _passwordController.text.trim();
       final name = _nameController.text.trim();
 
+      // Debug logs
+      print("📌 Attempting signup");
+      print("  Email: $email");
+      print("  Name: $name");
+      print("  Role: $_role");
+
       // Validate email format
       if (!RegExp(r"^[^@]+@[^@]+\.[^@]+").hasMatch(email)) {
         throw Exception("Please enter a valid email address");
@@ -58,6 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen>
         throw Exception("Invalid Administration Key");
       }
 
+      // Call AuthService (department removed)
       await _authService.signUp(
         email,
         password,
@@ -65,15 +71,32 @@ class _SignUpScreenState extends State<SignUpScreen>
         _role,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Account created successfully! Please login.")));
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => LoginScreen()));
+      print("✅ Signup finished successfully");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Account created successfully! Please login.")),
+      );
+
+      // Wait 2 seconds so CircularProgressIndicator is visible
+      await Future.delayed(Duration(seconds: 2));
+
+      setState(() => _loading = false);
+
+      // Navigate to login screen and pass the email for autofill
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => LoginScreen(
+            prefilledEmail: email,
+          ),
+        ),
+        (route) => false,
+      );
     } catch (e) {
+      print("🔥 Error during signup: $e"); // Debug error
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
+      setState(() => _loading = false);
     }
-    setState(() => _loading = false);
   }
 
   InputDecoration _inputDecoration(String label, IconData icon,
@@ -135,10 +158,10 @@ class _SignUpScreenState extends State<SignUpScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.person_add_alt_1,
+                        Icon(Icons.local_hospital,
                             size: 64, color: Colors.blueGrey.shade700),
                         SizedBox(height: 16),
-                        Text("Create an Account",
+                        Text("Elegant Medical Clinic",
                             style: TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
@@ -188,27 +211,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                             obscureText: _obscureAdminKey,
                           ),
                         ],
-                        if (_role == "user") ...[
-                          SizedBox(height: 16),
-                          DropdownButtonFormField<String>(
-                            value: _department,
-                            decoration:
-                                _inputDecoration("Department", Icons.business),
-                            dropdownColor: Colors.white,
-                            icon: Icon(Icons.arrow_drop_down,
-                                color: Colors.blueGrey.shade700),
-                            borderRadius: BorderRadius.circular(16),
-                            items: ["dentistry", "radiology", "orthopedics"]
-                                .map((d) => DropdownMenuItem(
-                                    value: d,
-                                    child: Text(d,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500))))
-                                .toList(),
-                            onChanged: (val) =>
-                                setState(() => _department = val!),
-                          ),
-                        ],
                         SizedBox(height: 28),
                         _loading
                             ? CircularProgressIndicator()
@@ -244,8 +246,14 @@ class _SignUpScreenState extends State<SignUpScreen>
                               ),
                         SizedBox(height: 16),
                         TextButton(
-                          onPressed: () => Navigator.pushReplacement(context,
-                              MaterialPageRoute(builder: (_) => LoginScreen())),
+                          onPressed: () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => LoginScreen(
+                                prefilledEmail: _emailController.text.trim(),
+                              ),
+                            ),
+                          ),
                           child: Text("Already have an account? Login",
                               style: TextStyle(
                                   fontSize: 14,

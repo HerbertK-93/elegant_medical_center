@@ -94,13 +94,46 @@ class RadiologyDashboard extends StatelessWidget {
     final ageController = TextEditingController();
     final contactController = TextEditingController();
     final addressController = TextEditingController();
-    final reasonController = TextEditingController();
     final notesController = TextEditingController();
 
     final serviceController = TextEditingController();
     final doctorController = TextEditingController();
     final amountController = TextEditingController();
     final totalController = TextEditingController();
+
+    String? selectedService;
+    final List<String> services = [
+      'X-ray, Chest, Single View',
+      'X-ray, Chest, Two Views',
+      'X-ray, Chest, Four or More Views',
+      'X-ray, Abdomen, Single View (KUB)',
+      'X-ray, Abdomen, Two Views',
+      'X-ray, Abdomen, Three or More Views',
+      'X-ray, Spine, Cervical, Two or Three Views',
+      'X-ray, Spine, Thoracic, Two or Three Views',
+      'X-ray, Spine, Lumbar, Two or Three Views',
+      'X-ray, Extremity, Upper (eg, Hand, Wrist, Forearm), Two Views',
+      'X-ray, Extremity, Lower (eg, Foot, Ankle, Legi, Two Views',
+      'X-ray, Knee, Two Views',
+      'X-ray, Shoulder, Two Views',
+      'X-ray, Hip, Unilateral, Two or Three Views',
+      'X-ray, Mandible, Complete, Minimum of Two Views',
+      'X-ray, Facial Bones, Complete, Minimum of Two Views',
+      'Ultrasound, Abdomen, Complete',
+      'Ultrasound, Abdomen, Limited',
+      'Ultrasound, Pelvis, Non-Obstetric, Transabdominal',
+      'Ultrasound, Pelvis, Non-Obstetric, Transvaginal',
+      'Ultrasound, Pregnant Uterus, Complete',
+      'Ultrasound, Pregnant Uterus, Limited',
+      'Ultrasound, Pregnant Uterus, Follow-up',
+      'Ultrasound, Breast, Unilateral, Complete',
+      'Ultrasound, Breast, Unilateral, Limited',
+      'Ultrasound, Thyroid',
+      'Ultrasound, Scrotum',
+      'Duplex Scan of Extracranial Arteries',
+      'Duplex Scan of Lower Extremity Arteries or Veins',
+      'Ultrasound, Joint or Other Nonvascular Extremity Structure',
+    ];
 
     String paymentStatus = "Pending"; // default
 
@@ -134,7 +167,32 @@ class RadiologyDashboard extends StatelessWidget {
                       _buildTextField("Contact Number", contactController,
                           keyboard: TextInputType.phone),
                       _buildTextField("Address", addressController),
-                      _buildTextField("Reason", reasonController),
+
+                      /// Services Dropdown
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: "Services",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          value: selectedService,
+                          items: services.map((String service) {
+                            return DropdownMenuItem<String>(
+                              value: service,
+                              child: Text(service),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedService = newValue;
+                            });
+                          },
+                        ),
+                      ),
+
                       _buildTextField("Doctor Notes", notesController,
                           maxLines: 3),
 
@@ -210,7 +268,7 @@ class RadiologyDashboard extends StatelessWidget {
                       "Age": ageController.text,
                       "Contact": contactController.text,
                       "Address": addressController.text,
-                      "Reason": reasonController.text,
+                      "Services": selectedService, // Use selectedService
                       "DoctorNotes": notesController.text,
                       "PaymentStatus": paymentStatus,
                       if (paymentStatus == "Paid") ...{

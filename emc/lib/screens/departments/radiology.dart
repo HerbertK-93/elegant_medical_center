@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RadiologyDashboard extends StatelessWidget {
   const RadiologyDashboard({super.key});
@@ -96,11 +97,6 @@ class RadiologyDashboard extends StatelessWidget {
     final addressController = TextEditingController();
     final notesController = TextEditingController();
 
-    final serviceController = TextEditingController();
-    final doctorController = TextEditingController();
-    final amountController = TextEditingController();
-    final totalController = TextEditingController();
-
     String? selectedService;
     final List<String> services = [
       'X-ray, Chest, Single View',
@@ -135,7 +131,12 @@ class RadiologyDashboard extends StatelessWidget {
       'Ultrasound, Joint or Other Nonvascular Extremity Structure',
     ];
 
-    String paymentStatus = "Pending"; // default
+    final serviceController = TextEditingController();
+    final doctorController = TextEditingController();
+    final amountController = TextEditingController();
+    final totalController = TextEditingController();
+
+    String paymentStatus = "Pending";
 
     showDialog(
       context: context,
@@ -151,12 +152,11 @@ class RadiologyDashboard extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               content: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6, // wider dialog
+                width: MediaQuery.of(context).size.width * 0.6,
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      /// Patient Info
                       const Text("Patient Info",
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
@@ -167,8 +167,6 @@ class RadiologyDashboard extends StatelessWidget {
                       _buildTextField("Contact Number", contactController,
                           keyboard: TextInputType.phone),
                       _buildTextField("Address", addressController),
-
-                      /// Services Dropdown
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: DropdownButtonFormField<String>(
@@ -192,13 +190,9 @@ class RadiologyDashboard extends StatelessWidget {
                           },
                         ),
                       ),
-
                       _buildTextField("Doctor Notes", notesController,
                           maxLines: 3),
-
                       const Divider(thickness: 1, height: 24),
-
-                      /// Payment Status (Choice Chips instead of dropdown)
                       const Text("Payment Status",
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
@@ -237,8 +231,6 @@ class RadiologyDashboard extends StatelessWidget {
                           ),
                         ],
                       ),
-
-                      /// Receipt Info (only if Paid)
                       if (paymentStatus == "Paid") ...[
                         const Divider(thickness: 1, height: 24),
                         const Text("Receipt",
@@ -261,27 +253,47 @@ class RadiologyDashboard extends StatelessWidget {
                   child: const Text("Cancel"),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
+                    if (selectedService == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Please select a service.")),
+                      );
+                      return;
+                    }
+
                     final recordData = {
                       "Date": dateController.text,
                       "Name": nameController.text,
                       "Age": ageController.text,
                       "Contact": contactController.text,
                       "Address": addressController.text,
-                      "Services": selectedService, // Use selectedService
+                      "Services": selectedService,
                       "DoctorNotes": notesController.text,
                       "PaymentStatus": paymentStatus,
                       if (paymentStatus == "Paid") ...{
                         "Service": serviceController.text,
                         "Doctor": doctorController.text,
-                        "Amount": amountController.text,
-                        "Total": totalController.text,
+                        "Amount": double.tryParse(amountController.text) ?? 0,
+                        "Total": double.tryParse(totalController.text) ?? 0,
                       }
                     };
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Saved: $recordData")),
-                    );
+
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('patient_records')
+                          .add(recordData);
+
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Record saved successfully!✅")),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Failed to save record: $e ❌")),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,

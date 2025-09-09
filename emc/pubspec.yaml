@@ -15,6 +15,7 @@ dependencies:
   firebase_auth: ^5.2.0
   cloud_firestore: ^5.4.4
   flutter_riverpod: ^2.5.1
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:
